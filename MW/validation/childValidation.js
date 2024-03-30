@@ -3,7 +3,7 @@ const { body, param, query } = require("express-validator");
 exports.insertValidator = [
     body("_id")
     .isInt()
-    .withMessage("Child Id Should Be Mongo Id"),
+    .withMessage("Child Id Should Be Int"),
 
     body("fullName")
         .isAlpha()
@@ -36,7 +36,7 @@ exports.updateValidator = [
     body("id")
         .optional()
         .isInt()
-        .withMessage("Child Id Should Be Mongo Id"),
+        .withMessage("Child Id Should Be Int"),
 
     body("fullName")
         .optional()

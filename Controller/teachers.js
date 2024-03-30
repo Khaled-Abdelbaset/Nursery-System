@@ -1,5 +1,39 @@
 const teacherSchema = require("../Model/teacherModel");
+const  bcrypt = require('bcryptjs');
 const classSchema = require("../Model/classModel");
+const multer  = require('multer');
+
+const multerStorage = multer.memoryStorage({
+    destination: function (req, file, callback) {
+        callback(null, 'photos/teacher');
+    },
+    filename: function (req, file, callback) {
+        const ext = file.mimetype.split('/')[1];
+        const fileName = `teacher-${Date.now()}.${ext}`;
+        callback(null, fileName);
+    },
+});
+
+const multerFilter = function (req, file, callback) {
+    if (file.mimetype.startsWith("image")) {
+        callback(null, true);
+    } else {
+        callback(new Error("only images allowed", 400), false);
+    }
+};
+
+const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
+exports.uploadTeacherImage = upload.single('image');
+
+exports.addTeacher = (req , res , next) => {
+    let object = new teacherSchema(req.body);
+    object
+    .save()
+    .then((data) => {
+        res.status(200).json({ data });
+    })
+    .catch((error) => next(error));
+};
 
 exports.getTeachers = (req , res  ,next) => {
     teacherSchema.find({})
@@ -20,15 +54,6 @@ exports.getTeacherById = (req , res ,next) => {
     .catch((error) => next(error));
 };
 
-exports.addTeacher = (req , res , next) => {
-    let object = new teacherSchema(req.body);
-    object
-    .save()
-    .then((data) => {
-        res.status(200).json({ data });
-    })
-    .catch((error) => next(error));
-};
 
 exports.updateTeacher = (req , res , next) => { 
     teacherSchema.updateOne({
@@ -48,40 +73,17 @@ exports.updateTeacher = (req , res , next) => {
     .catch(error=>next(error));
 };
 
-// exports.changeUserPass = async(req , res , next) => {
-
-//     console.log(req.params.id);
-//     const document = await teacherSchema.findByIdAndUpdate (
-//         req.params.id,
-//         {
-//             password: await bcrypt.hash(req.body.password, 10)
-//         },
-//         {new:true}
-//     );
-//     if(!document){
-//         return next(new Error("Password Can't Be Updated"));
-//     }
-//     res.status(200).json({data:document})
-// };
-
-exports.changeUserPass = async (req, res, next) => {
-    console.log(req.params.id);
-    try {
-        const document = await teacherSchema.findByIdAndUpdate(
-            req.params.id,
-            {
-                password: await bcrypt.hash(req.body.password, 10)
-            },
-            { new: true }
-        );
-        if (!document) {
-            return res.status(404).json({ error: "User not found" });
-        }
-        res.status(200).json({ data: document });
-    } catch (error) {
-        return next(error);
+exports.changeUserPass = async(req , res , next) => {
+    const updatePass = await teacherSchema.findByIdAndUpdate(
+        req.params.id,
+        {
+            password:await bcrypt.hash(req.body.password, 10)
+        });
+    if(!updatePass){
+        return next(new Error(`Can Not Update Password OF This Id : ${req.params.id}`) , 404);
     }
-};
+    res.status(200).json({data:updatePass})
+}
 
 exports.deleteTeacher = (req , res , next) => {
     teacherSchema.deleteOne({

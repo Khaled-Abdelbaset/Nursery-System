@@ -10,17 +10,16 @@ const classRoutes = require("./Routes/classRoutes");
 const server = express();
 
 const port = process.env.PORT || 8080;
-mongoose
-    .connect("mongodb://127.0.0.1:/ITISystem")
-    .then(() => {
-        console.log("DB Connected....");
-        server.listen(port, () => {
-        console.log("listening on Port : ",port);
-        });
-    })
-    .catch((error) => {
-        console.log("Error" + error);
-});
+mongoose.connect("mongodb://127.0.0.1:/ITISystem")
+  .then(() => {
+    console.log("DB Connected....");
+    server.listen(port, () => {
+    console.log("listening on Port : ", port);
+    });
+  })
+  .catch((error) => {
+    console.log("Error" + error);
+  });
 
 server.use((request, response, next) => {
   console.log(request.url, request.method);

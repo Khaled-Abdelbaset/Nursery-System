@@ -33,20 +33,35 @@ server.use(express.json());
 
 const options = {
   definition: {
-    openapi: '3.0.0',
+    openapi: '3.0.0', // Specification (optional, defaults to swagger: '2.0')
     servers: [
-      { url: process.env.LOCAL_URL }
+      {url: process.env.LOCAL_URL }
     ],
     info: {
-      title: 'NurserySystem Project Docs', 
-      version: '1.0.0',
+      title: 'NurserySystem Documentation', 
+      version: '1.0.0', 
       description:
-      ""
+      "The Nursery System project aims to provide a simple yet effective management system for a nursery. The system will have one administrator who will have access to add teachers and children to the system. once registered, they can log in to access their account. The administrator will be responsible for adding children to the system, assigning them to specific teachers, and managing other administrative tasks."
     },
-
+    security: [
+      {
+        apiKeyAuth: []
+      }
+    ],
+    components: {
+      securitySchemes: {
+        apiKeyAuth: {
+          type: 'apiKey',
+          in: 'header',
+          name: 'x-api-key'
+        }
+      }
+    }
   },
-  apis: ['./Routes/*.js'],
+  // Path to the API docs
+  apis: ['./Routes/*.js'], // Path to the API docs
 };
+
 
 server.use(teacherRoutes);
 server.use(childRoutes);

@@ -28,6 +28,28 @@ const login = require("../MW/validation/loginValidation");
  *               image:
  *                 type: string
  *                 format: binary
+ *               fullName:
+ *                 type: string
+ *                 description: The full name of the child.
+ *               age:
+ *                 type: number
+ *                 description: The age of the child.
+ *               level:
+ *                 type: string
+ *                 enum: ["KG1", "KG2"]
+ *                 description: The level of the child (KG1 or KG2).
+ *               address:
+ *                 type: object
+ *                 properties:
+ *                   city:
+ *                     type: string
+ *                     description: The city where the child resides.
+ *                   street:
+ *                     type: string
+ *                     description: The street where the child resides.
+ *                   building:
+ *                     type: string
+ *                     description: The building where the child resides.
  *     responses:
  *       200:
  *         description: Successfully added child.
@@ -71,6 +93,28 @@ router.route("/childs")
  *               image:
  *                 type: string
  *                 format: binary
+ *               fullName:
+ *                 type: string
+ *                 description: The updated full name of the child.
+ *               age:
+ *                 type: number
+ *                 description: The updated age of the child.
+ *               level:
+ *                 type: string
+ *                 enum: ["KG1", "KG2"]
+ *                 description: The updated level of the child (KG1 or KG2).
+ *               address:
+ *                 type: object
+ *                 properties:
+ *                   city:
+ *                     type: string
+ *                     description: The updated city where the child resides.
+ *                   street:
+ *                     type: string
+ *                     description: The updated street where the child resides.
+ *                   building:
+ *                     type: string
+ *                     description: The updated building where the child resides.
  *     responses:
  *       200:
  *         description: Successfully updated child.
@@ -87,6 +131,7 @@ router.route("/childs")
  *       200:
  *         description: Successfully deleted child.
  */
+
 router.route("/childs/:id")
   .get(controller.getChildById)
   .patch(upload.upload.single("image"), validation.updateValidator, validationResult, controller.updateChild)

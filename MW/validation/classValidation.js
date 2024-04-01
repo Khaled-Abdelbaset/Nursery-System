@@ -3,10 +3,6 @@ const teacherSchema = require("../../Model/teacherModel");
 const childSchema = require("../../Model/childModel");
 
 exports.insertValidator = [
-    body("_id")
-        .isInt()
-        .withMessage("Class Id Should Be Int"),
-
     body("name")
         .isAlpha()
         .withMessage("Class Name Should be String")

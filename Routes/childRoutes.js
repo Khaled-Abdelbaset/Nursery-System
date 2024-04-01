@@ -1,18 +1,95 @@
 const express = require("express");
 const router = express.Router();
 const controller = require("../Controller/childs");
-const { insertValidator } = require("../MW/validation/childValidation");
+const validation = require("../MW/validation/childValidation");
 const validationResult = require("../MW/validation/validationResult");
-const {uploadChildImage} = require('../Controller/childs')
+const upload = require("../Controller/photoController");
+const login = require("../MW/validation/loginValidation");
 
-router
-  .route("/childs")
-  .get(controller.getChilds)
-  .post(uploadChildImage, controller.addChild);
+/**
+ * @swagger
+ * /childs:
+ *   get:
+ *     summary: Retrieve all children
+ *     description: Retrieve a list of all children.
+ *     responses:
+ *       200:
+ *         description: A list of children.
+ *   post:
+ *     summary: Add a new child
+ *     description: Add a new child to the system.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Successfully added child.
+ */
 
+router.route("/childs")
+  .get(login.protect, controller.getChilds)
+  .post(login.protect, upload.upload.single("image"), validation.insertValidator, validationResult, controller.addChild);
+
+/**
+ * @swagger
+ * /childs/{id}:
+ *   get:
+ *     summary: Retrieve a child by ID
+ *     description: Retrieve a single child by their ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: A single child.
+ *   patch:
+ *     summary: Update a child by ID
+ *     description: Update a single child by their ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Successfully updated child.
+ *   delete:
+ *     summary: Delete a child by ID
+ *     description: Delete a single child by their ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successfully deleted child.
+ */
 router.route("/childs/:id")
   .get(controller.getChildById)
-  .patch(uploadChildImage, controller.updateChild)
+  .patch(upload.upload.single("image"), validation.updateValidator, validationResult, controller.updateChild)
   .delete(controller.deleteChild);
 
 module.exports = router;

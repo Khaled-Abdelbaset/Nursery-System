@@ -1,28 +1,28 @@
 const childSchema = require("../Model/childModel");
-const classSchema = require("../Model/classModel");
-const multer  = require('multer');
+const fs = require('fs');
 
-const multerStorage = multer.memoryStorage({
-    destination: function (req, file, callback) {
-        callback(null, 'photos/children');
-    },
-    filename: function (req, file, callback) {
-        const ext = file.mimetype.split('/')[1];
-        const fileName = `children-${Date.now()}.${ext}`;
-        callback(null, fileName);
-    },
-});
-
-const multerFilter = function (req, file, callback) {
-    if (file.mimetype.startsWith("image")) {
-        callback(null, true);
+exports.addChild = (req, res, next) => {
+    let object = new childSchema(req.body);
+    if (req.file) {
+        object.image = `${Date.now()}-${req.file.originalname}`;
+        fs.writeFile(`Photos/children/${object.image}`, req.file.buffer, (err) => {
+        if (err) return next(err);
+        object
+            .save()
+            .then((data) => {
+            res.status(200).json({ data });
+            })
+            .catch((error) => next(error));
+        });
     } else {
-        callback(new Error("only images allowed", 400), false);
+        object
+        .save()
+        .then((data) => {
+            res.status(200).json({data});
+        })
+        .catch((error) => next(error));
     }
 };
-
-const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
-exports.uploadChildImage = upload.single('image');
 
 exports.getChilds = (req , res  ,next) => {
     childSchema.find({})
@@ -31,7 +31,6 @@ exports.getChilds = (req , res  ,next) => {
     })
     .catch((error) => next(error));
 };
-
 
 exports.getChildById = (req , res ,next) => {
     childSchema.findOne({ _id: req.params.id })
@@ -44,15 +43,6 @@ exports.getChildById = (req , res ,next) => {
     .catch((error) => next(error));
 };
 
-exports.addChild = (req , res , next) => {
-    let object = new childSchema(req.body);
-    object
-    .save()
-    .then((data) => {
-        res.status(200).json({ data });
-    })
-    .catch((error) => next(error));
-};
 
 exports.updateChild = (req , res , next) => { 
     childSchema.updateOne({

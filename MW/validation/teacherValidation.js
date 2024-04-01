@@ -4,10 +4,6 @@ const teacherSchema = require("../../Model/teacherModel");
 const classSchema = require("../../Model/classModel");
 
 exports.insertValidator = [
-  body("_id")
-  .isMongoId()
-  .withMessage("Teacher Id Should Be Mongo Id"),
-
   body("fullName")
   .isAlpha()
   .withMessage("Teacher Name Should Be String")
@@ -16,15 +12,14 @@ exports.insertValidator = [
 
   body("email")
   .isEmail()
-  .withMessage("Email Is Not Valid")
-  ];
+  .withMessage("Email Is Not Valid"),
+
+  body('passwordConfirm')
+    .notEmpty()
+    .withMessage('Password confirmation required'),
+];
 
 exports.updateValidator = [
-  body("_id")
-  .optional()
-  .isMongoId()
-  .withMessage("Teacher Id Should Be Mongo Id"),
-
   body("fullName")
   .optional()
   .isAlpha()
@@ -41,17 +36,17 @@ exports.updateValidator = [
   .withMessage("Email Is Not Valid")
 ];
 
-exports.deleteValidation = [
-    param("_id")
+exports.deleteValidator = [
+  param("id")
     .isMongoId()
     .withMessage("Teacher Id Should Be Mongo Id")
     .custom(async (_id) => {
-      const teacherSupervise = await classSchema.countDocuments({supervisor: _id});
-      console.log(teacherSupervise + "1")
-      if (teacherSupervise) {
-        console.log(teacherSupervise)
-        throw new Error("Teacher Is A Supervisor, Can't Be Deleted");
-      }
+        const teacherSupervise = await classSchema.countDocuments({ supervisor: _id });
+        console.log(teacherSupervise + "1");
+        if (teacherSupervise) {
+            console.log(teacherSupervise);
+            throw new Error("Teacher Is A Supervisor, Can't Be Deleted");
+        }
     })
 ];
 
@@ -73,7 +68,7 @@ exports.changePassword = [
         teacher.password
     );
     if (!isCorrectPassword) {
-      throw new Error('Incorrect current password');
+      throw new Error('Current Password Is Incorrect');
     }
     return true;
   })

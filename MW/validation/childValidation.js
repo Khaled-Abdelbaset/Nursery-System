@@ -1,10 +1,6 @@
 const { body, param, query } = require("express-validator");
 
 exports.insertValidator = [
-    body("_id")
-    .isInt()
-    .withMessage("Child Id Should Be Int"),
-
     body("fullName")
         .isAlpha()
         .withMessage("Child Name Should Be String")
@@ -27,17 +23,12 @@ exports.insertValidator = [
         .notEmpty()
         .withMessage("Street Must Be Entered"),
 
-    body("address.builiding")
+    body("address.building")
         .notEmpty()
         .withMessage("Building Must Be Entered")
 ];
 
 exports.updateValidator = [
-    body("id")
-        .optional()
-        .isInt()
-        .withMessage("Child Id Should Be Int"),
-
     body("fullName")
         .optional()
         .isAlpha()
@@ -65,7 +56,7 @@ exports.updateValidator = [
         .notEmpty()
         .withMessage("Street Can't Be Empty"),
 
-    body("address.builiding")
+    body("address.building")
         .optional()
         .notEmpty()
         .withMessage("Building Can't Be Empty")
